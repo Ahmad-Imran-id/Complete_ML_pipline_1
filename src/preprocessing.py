@@ -102,8 +102,8 @@ def main(text_collum='text',target_collum='target'):
         data_path=os.path.join('./data','interm_data')
         os.makedirs(data_path,exist_ok=True)
 
-        final_train_df.to_csv(os.path.join(data_path,'train_processed.csv'))
-        final_test_df.to_csv(os.path.join(data_path,'test_processed.csv'))
+        final_train_df.to_csv(os.path.join(data_path,'train_processed.csv'),index=False)
+        final_test_df.to_csv(os.path.join(data_path,'test_processed.csv'),index=False)
         logger.debug('Processedd Data to %s, data_path')
 
     except FileNotFoundError as e:
