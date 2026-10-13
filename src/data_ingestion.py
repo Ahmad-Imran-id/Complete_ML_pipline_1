@@ -47,6 +47,7 @@ def load_parms(param_path:str)->dict:
 
 
 def load_data (data_url:str)-> pd.DataFrame:
+    '''Loads data from url into a pandas dataframe'''
     try:
         df=pd.read_csv(data_url)
         logger.debug('Data loaded successfully from %s', data_url)
@@ -62,6 +63,7 @@ def load_data (data_url:str)-> pd.DataFrame:
 
 
 def data_prepocessing(df:pd.DataFrame)-> pd.DataFrame:
+    '''Removes unnessasary collums and renames the ones needed'''
     try:
         df.drop(columns=['Unnamed: 2','Unnamed: 3','Unnamed: 4'],inplace=True)
         df.rename(columns={'v1':'target','v2':'text'},inplace=True)
@@ -77,6 +79,7 @@ def data_prepocessing(df:pd.DataFrame)-> pd.DataFrame:
         raise
 
 def save_data(train_data:pd.DataFrame,test_data:pd.DataFrame,data_path:str):
+    '''Creates directory ./data/raw/ and saves train and test data into it as csv file'''
     try:
         raw_data_path=os.path.join(data_path,'raw')
         os.makedirs(raw_data_path,exist_ok=True)
@@ -89,6 +92,7 @@ def save_data(train_data:pd.DataFrame,test_data:pd.DataFrame,data_path:str):
         raise
 
 def main():
+    '''Performs the complete operation (loads data,cleans data and saves data to directory)'''
     try:
         parms=load_parms(param_path='params.yaml')
         test_size=parms['data_ingestion']['test_size']
