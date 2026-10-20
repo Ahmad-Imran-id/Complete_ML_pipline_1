@@ -95,7 +95,7 @@ def main():
     '''Performs the complete operation (loads data,cleans data and saves data to directory)'''
     try:
         parms=load_parms(param_path='params.yaml')
-        test_size=0.21
+        test_size=parms['data_ingestion']['test_size']
         data_url='https://raw.githubusercontent.com/vikashishere/Datasets/main/spam.csv'
         df=load_data(data_url)
         final_df=data_prepocessing(df)

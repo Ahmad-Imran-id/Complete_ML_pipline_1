@@ -4,6 +4,7 @@ import numpy as np
 import logging
 import pickle
 from sklearn.ensemble import RandomForestClassifier
+import yaml
 
 log_dir='logs'
 os.makedirs(log_dir,exist_ok=True)
@@ -27,11 +28,29 @@ file_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
 
+def load_params(params_path: str) -> dict:
+    """Load parameters from a YAML file."""
+    try:
+        with open(params_path, 'r') as file:
+            params = yaml.safe_load(file)
+        logger.debug('Parameters retrieved from %s', params_path)
+        return params
+    except FileNotFoundError:
+        logger.error('File not found: %s', params_path)
+        raise
+    except yaml.YAMLError as e:
+        logger.error('YAML error: %s', e)
+        raise
+    except Exception as e:
+        logger.error('Unexpected error: %s', e)
+        raise
+
 def load_data(file_path:str)->tuple:
     try:
         df=pd.read_csv(file_path)
         X_train=df.iloc[:,:-1].values
         y_train=df.iloc[:,-1].values
+        
         logger.debug('Data loaded from %s with X_train shape: %s , y_train shape: %s ',file_path,X_train.shape,y_train.shape)
         return X_train,y_train
     except pd.errors.ParserError as e:
@@ -79,7 +98,8 @@ def save_model(model,filepath:str)->None:
 
 def main():
     try:
-        params={'n_estimators':25,'random_state':3}
+        params=load_params(params_path='params.yaml')['model_training']
+
 
         X_train,y_train=load_data('./data/processed/train_tfidf.csv')
 
