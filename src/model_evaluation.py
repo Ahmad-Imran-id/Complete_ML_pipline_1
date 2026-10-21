@@ -5,6 +5,8 @@ import numpy as np
 from sklearn.metrics import accuracy_score,precision_score,roc_auc_score,recall_score
 import pickle
 import json
+import yaml 
+from dvclive import Live
 
 log_dir='logs'
 os.makedirs(log_dir,exist_ok=True)
@@ -25,6 +27,21 @@ filehandler.setFormatter(formatter)
 logger.addHandler(console_handler)
 logger.addHandler(filehandler)
 
+def load_params(file_path: str) -> dict:
+    try:
+        with open(file_path,'r') as file:
+            params=yaml.safe_load(file)
+        return params
+    except FileNotFoundError:
+            logger.error('File not found: %s', file_path)
+            raise
+    except yaml.YAMLError as e:
+            logger.error('YAML error: %s', e)
+            raise
+    except Exception as e:
+        logger.error('Unexpected error while trying to load parameters: %s', e)
+        raise
+        
 
 def load_model(file_path:str):
     try:
@@ -104,15 +121,25 @@ def main():
         X_test=df.iloc[:,:-1].values
         y_test=df.iloc[:,-1].values
 
+        params=load_params('params.yaml')
+            
         metrics_dict=evaulation(model,X_test,y_test)
-
         save_metrics(metrics_dict,'reports/metrics.json')
+
+        #Experiment tracking using dvclive
+        with Live(save_dvc_exp=True) as live:
+            live.log_metric('accuracy',metrics_dict['accuracy_score'])
+            live.log_metric('precision',metrics_dict['precision_socre'])
+            live.log_metric('recall',metrics_dict['recall_score'])
+            live.log_metric('roc_auc',metrics_dict['roc_auc_score'])
+
+            live.log_params(params)
 
         logger.debug('Whole process completed sucessfully')
 
     except Exception as e:
         logger.error('Unexpected error during main process : %s', e)
-        print(f'Error: {e}')
+        raise
 
 if __name__=='__main__':
     main()

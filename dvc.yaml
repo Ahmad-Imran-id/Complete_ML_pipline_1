@@ -45,3 +45,10 @@ stages:
     - models/model.pkl
     metrics:
     - reports/metrics.json
+metrics:
+- dvclive/metrics.json
+plots:
+- dvclive/plots/metrics:
+    x: step
+params:
+- dvclive/params.yaml
